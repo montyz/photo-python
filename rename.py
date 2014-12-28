@@ -12,8 +12,7 @@ badones = []
 #originals = '/Users/montyzukowski/personal/pix'
 #destination = '/Users/montyzukowski/Dropbox/FamilyShared/Photos/2014 Family Photos'
 
-originals = '/Users/montyzukowski/Google Drive/Photo Archives/origs/Pictures/2000/01/08'
-#originals = '/Users/montyzukowski/personal/pix'
+originals = '/Users/montyzukowski/Google Drive/Photo Archives/origs/'
 destination = '/Users/montyzukowski/Google Drive/Photo Archives/'
 
 if not os.path.exists(destination):
@@ -42,6 +41,7 @@ dt_fn_map = {}
 
 
 def movePicture(dt, fn, destination):
+    print dt, fn, destination
     date, time = dt.split()
     year, month, day = date.split(":")
     i = 0
@@ -60,12 +60,14 @@ def movePicture(dt, fn, destination):
     while os.path.exists(dest):
         i = i + 1
         dest = os.path.join(destdir, '%s-%s-%s-%s.jpg' % (year, month, day, generate_suffix(time, i)))
-    #os.rename(fn, dest)
+    print 'saving', fn, 'to', dest
+    os.rename(fn, dest)
+
     print 'saved', dest
 
 
 for root, dirs, files in os.walk(originals):
-    print 'processing', root
+    i = 0
     for name in files:
         if not (name.endswith(".jpg") or name.endswith(".jpeg")
                 or name.endswith(".JPG") or name.endswith(".JPEG")):
@@ -83,16 +85,22 @@ for root, dirs, files in os.walk(originals):
             tags = exifread.process_file(f)
             if tags.has_key("EXIF DateTimeOriginal"):
                 dt = tags["EXIF DateTimeOriginal"].printable
+                '''if not dt.strip():
+                    dt = tags["Image DateTime"].printable
+                '''
             else:
                 obj = datetime.datetime.fromtimestamp(os.path.getctime(fn))
                 dt = obj.isoformat(' ')
                 dt = dt.replace('-', ':')
-                print dt
-            dt_fn_map[dt] = fn
+            if ':' in dt:
+                dt_fn_map[dt] = fn
+                i += 1
         except Exception, e:
             badones.append(fn)
             print e
         f.close()
+    if i:
+        print 'processing', root, i
 
 keys = dt_fn_map.keys()
 print 'sorting', len(keys), 'keys'
