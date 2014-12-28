@@ -89,7 +89,8 @@ for root, dirs, files in os.walk(originals):
                     dt = tags["Image DateTime"].printable
                 '''
             else:
-                obj = datetime.datetime.fromtimestamp(os.path.getctime(fn))
+                obj = datetime.datetime.fromtimestamp(os.path.getmtime(fn))
+                print fn, 'creation time', obj
                 dt = obj.isoformat(' ')
                 dt = dt.replace('-', ':')
             if ':' in dt:
