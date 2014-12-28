@@ -1,4 +1,6 @@
 import os
+import time
+import datetime
 import exifread
 import string
 
@@ -10,7 +12,7 @@ badones = []
 #originals = '/Users/montyzukowski/personal/pix'
 #destination = '/Users/montyzukowski/Dropbox/FamilyShared/Photos/2014 Family Photos'
 
-originals = '/Users/montyzukowski/Google Drive/Photo Archives/origs/Pictures/2001/01/01'
+originals = '/Users/montyzukowski/Google Drive/Photo Archives/origs/Pictures/2000/01/08'
 #originals = '/Users/montyzukowski/personal/pix'
 destination = '/Users/montyzukowski/Google Drive/Photo Archives/'
 
@@ -81,10 +83,12 @@ for root, dirs, files in os.walk(originals):
             tags = exifread.process_file(f)
             if tags.has_key("EXIF DateTimeOriginal"):
                 dt = tags["EXIF DateTimeOriginal"].printable
-                dt_fn_map[dt] = fn
             else:
-                print 'no exif info for', fn
-                badones.append(fn)
+                obj = datetime.datetime.fromtimestamp(os.path.getctime(fn))
+                dt = obj.isoformat(' ')
+                dt = dt.replace('-', ':')
+                print dt
+            dt_fn_map[dt] = fn
         except Exception, e:
             badones.append(fn)
             print e
