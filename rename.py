@@ -25,17 +25,21 @@ ltrs = string.ascii_letters + string.digits
 
 
 def generate_suffix(time, i=0):
-    hours, mins, secs = time.split(":")
-    h = int(hours)
-    m = int(mins)
-    s = int(secs) + i
-    if s >= len(ltrs):
-        s -= len(ltrs)
-        m += 1
-    if m >= len(ltrs):
-        m -= len(ltrs)
-        h += len(ltrs)
-    return ltrs[h] + ltrs[m] + ltrs[s]
+    try:
+        hours, mins, secs = time.split(":")
+        h = int(hours)
+        m = int(mins)
+        s = int(secs) + i
+        while s >= len(ltrs):
+            s -= len(ltrs)
+            m += 1
+        if m >= len(ltrs):
+            m -= len(ltrs)
+            h += 1
+        return ltrs[h] + ltrs[m] + ltrs[s]
+    except IndexError:
+        print h, m, s
+        return "bad-"+h+m+s
 
 dt_fn_map = {}
 
@@ -72,7 +76,7 @@ for root, dirs, files in os.walk(originals):
         if not (name.endswith(".jpg") or name.endswith(".jpeg")
                 or name.endswith(".JPG") or name.endswith(".JPEG")):
             continue
-        if 'Thumbs' in root:
+        if 'Thumbs' in root or 'Thumbnails' in root:
             print 'Skipping', root
             continue
         fn = os.path.join(root, name)
@@ -102,6 +106,8 @@ for root, dirs, files in os.walk(originals):
         f.close()
     if i:
         print 'processing', root, i
+
+print dt_fn_map
 
 keys = dt_fn_map.keys()
 print 'sorting', len(keys), 'keys'
