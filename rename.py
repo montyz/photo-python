@@ -82,28 +82,28 @@ for root, dirs, files in os.walk(originals):
         fn = os.path.join(root, name)
 
         # Open image file for reading (binary mode)
-        f = open(fn, 'rb')
 
         # Return Exif tags
         try:
-            tags = exifread.process_file(f)
-            if tags.has_key("EXIF DateTimeOriginal"):
-                dt = tags["EXIF DateTimeOriginal"].printable
-                '''if not dt.strip():
-                    dt = tags["Image DateTime"].printable
-                '''
-            else:
-                obj = datetime.datetime.fromtimestamp(os.path.getmtime(fn))
-                print fn, 'creation time', obj
-                dt = obj.isoformat(' ')
-                dt = dt.replace('-', ':')
-            if ':' in dt:
-                dt_fn_map[dt] = fn
-                i += 1
+            with open(fn, 'rb') as f:
+                tags = exifread.process_file(f)
+                if tags.has_key("EXIF DateTimeOriginal"):
+                    dt = tags["EXIF DateTimeOriginal"].printable
+                    '''if not dt.strip():
+                        dt = tags["Image DateTime"].printable
+                    '''
+                else:
+                    obj = datetime.datetime.fromtimestamp(os.path.getmtime(fn))
+                    print fn, 'creation time', obj
+                    dt = obj.isoformat(' ')
+                    dt = dt.replace('-', ':')
+                if ':' in dt:
+                    dt_fn_map[dt] = fn
+                    i += 1
         except Exception, e:
             badones.append(fn)
             print e
-        f.close()
+
     if i:
         print 'processing', root, i
 
